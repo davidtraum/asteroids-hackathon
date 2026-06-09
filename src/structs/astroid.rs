@@ -22,7 +22,7 @@ impl Astroid {
             x: gen_range(x - 1000., x + 1000.),
             y: gen_range(y - 1000., y + 1000.),
             size: gen_range(10., 100.),
-            sides: gen_range(4, 10),
+            sides: gen_range(5, 10),
             rotation: gen_range(0., 360.),
             rotation_speed: gen_range(-30.0, 30.0),
             direction_x: gen_range(-1., 1.),
