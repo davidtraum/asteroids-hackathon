@@ -16,8 +16,8 @@ pub struct Astroid {
 
 impl Astroid {
     pub fn new_at_random_position(pos: Vec2) -> Self {
-        let spawn_above_screen = gen_range(0, 1) > 0;
-        let spawn_left_of_screen = gen_range(0, 1) > 0;
+        let spawn_above_screen = gen_range(0, 2) == 0;
+        let spawn_left_of_screen = gen_range(0, 2) == 0;
         let max_outside_bounds = 1000.;
         let min_outside_bounds = 100.;
         let dynamic_param = vec2(
@@ -59,6 +59,6 @@ impl Drawable for Astroid {
 impl Updatable for Astroid {
     fn update(&mut self, context: &crate::structs::context::Context) {
         self.rotation += self.rotation_speed * context.delta_time;
-        self.pos += self.direction * context.delta_time * 100.0;
+        self.pos += self.direction * context.delta_time * 10.0;
     }
 }
