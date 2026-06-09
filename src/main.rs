@@ -1,11 +1,14 @@
 use macroquad::prelude::*;
 
 mod structs;
+#[cfg(test)]
+mod tests;
 mod traits;
+mod utils;
 
 use structs::astroid::Astroid;
-use structs::spaceship::Spaceship;
 use structs::context::Context;
+use structs::spaceship::Spaceship;
 use traits::drawable::Drawable;
 use traits::updatable::Updatable;
 
@@ -21,14 +24,16 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut astroids = vec![];
-    let mut spaceship = Spaceship::new();
-    let mut context = Context { delta_time: 0.0};
+    let center = vec2(screen_width() * 0.5, screen_height() * 0.5);
 
-    let pos = vec2(screen_width() * 0.5, screen_height() * 0.5);
+    let mut astroids = vec![];
+    let mut spaceship = Spaceship::new(center);
+    let mut context = Context { delta_time: 0.0 };
+
+    // let mut camera_post = spaceship.pos;
 
     for _ in 0..50 {
-        astroids.push(Astroid::new_at_random_position(pos.x,pos.y))
+        astroids.push(Astroid::new_at_random_position(center))
     }
 
     loop {
@@ -40,6 +45,14 @@ async fn main() {
         for astroid in &mut astroids {
             astroid.update(&context);
         }
+
+        // camera
+        set_camera(&Camera2D {
+            target: spaceship.pos,
+            // Zoom can be used to control how much of the world is visible
+            zoom: vec2(1.0 / (screen_width() / 2.0), 1.0 / (screen_height() / 2.0)),
+            ..Default::default()
+        });
 
         // draw
         clear_background(Color::from_rgba(16, 20, 28, 255));
