@@ -5,6 +5,7 @@ mod traits;
 
 use structs::astroid::Astroid;
 use structs::spaceship::Spaceship;
+use structs::context::Context;
 use traits::drawable::Drawable;
 use traits::updatable::Updatable;
 
@@ -22,23 +23,22 @@ fn window_conf() -> Conf {
 async fn main() {
     let mut astroids = vec![];
     let mut spaceship = Spaceship::new();
+    let mut context = Context { delta_time: 0.0};
 
-    let mut pos = vec2(screen_width() * 0.5, screen_height() * 0.5);
-    let mut velocity = vec2(160.0, 110.0);
-    let radius = 32.0;
+    let pos = vec2(screen_width() * 0.5, screen_height() * 0.5);
 
-    for _ in 0..5 {
-        astroids.push(Astroid::new_at_random_position())
+    for _ in 0..50 {
+        astroids.push(Astroid::new_at_random_position(pos.x,pos.y))
     }
 
     loop {
-        let dt = get_frame_time();
+        context.delta_time = get_frame_time();
 
         // update
-        spaceship.update();
+        spaceship.update(&context);
 
         for astroid in &mut astroids {
-            astroid.update();
+            astroid.update(&context);
         }
 
         // draw
@@ -49,7 +49,7 @@ async fn main() {
         }
 
         // hud
-        let fps = format!("FPS: {}", get_fps());
+        let fps = format!("FPS upd: {}", get_fps());
         draw_text(&fps, 32.0, screen_height() - 32.0, 24.0, GRAY);
 
         // ...

@@ -1,5 +1,5 @@
-#[allow(dead_code)]
+use crate::structs::context::Context;
 
 pub trait Updatable {
-    fn update(&mut self);
+    fn update(&mut self, context: &Context);
 }

@@ -27,5 +27,5 @@ impl Drawable for Spaceship {
 }
 
 impl Updatable for Spaceship {
-    fn update(&mut self) {}
+    fn update(&mut self, _context: &crate::structs::context::Context) {}
 }
