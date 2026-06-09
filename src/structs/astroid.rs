@@ -1,10 +1,11 @@
 use macroquad::math::{vec2, Vec2};
 use macroquad::rand::gen_range;
+use macroquad::window::screen_width;
+use macroquad::window::screen_height;
 use macroquad::{color::Color, shapes::draw_poly_lines};
 
 use crate::traits::drawable::Drawable;
 use crate::traits::updatable::Updatable;
-use crate::utils::angles::to_rad;
 
 pub struct Astroid {
     pub pos: Vec2,
@@ -24,7 +25,7 @@ impl Astroid {
         let spawn_above_screen = gen_range(0, 2) == 0;
         let spawn_left_of_screen = gen_range(0, 2) == 0;
         let max_outside_bounds = 1000.;
-        let min_outside_bounds = 100.;
+        let min_outside_bounds = 200.;
         let dynamic_param = vec2(
             gen_range(min_outside_bounds, max_outside_bounds),
             gen_range(min_outside_bounds, max_outside_bounds),
@@ -34,7 +35,8 @@ impl Astroid {
             if spawn_left_of_screen { -1. } else { 1. },
             if spawn_above_screen { -1. } else { 1. },
         );
-        let my_pos = pos + dynamic_param * flip_value;
+        let screen_offset = flip_value * vec2(screen_width(), screen_height());
+        let my_pos = pos + dynamic_param + screen_offset;
         Self {
             pos: my_pos,
             size: gen_range(10., 100.),
@@ -52,7 +54,7 @@ impl Astroid {
     pub fn split(&self, base_id: u32, force: bool, collider_id: i32) -> Option<(Self, Self)>{
         let new_size = self.size * 0.5;
 
-        if (!force && new_size < 20.) || collider_id == self.last_collider_id {
+        if (!force && new_size < 10.) || collider_id == self.last_collider_id {
             return None;
         }
 
@@ -65,7 +67,7 @@ impl Astroid {
                 rotation_speed: self.rotation_speed,
                 direction: vec2(self.direction.x, -self.direction.y),
                 velocity: self.velocity,
-                last_collider_id: self.id,
+                last_collider_id: base_id as i32 + 1,
                 id: base_id as i32,
                 current_collider_id: -1,
             },
@@ -78,7 +80,7 @@ impl Astroid {
                 direction: vec2(-self.direction.x, self.direction.y),
                 velocity: self.velocity,
                 id: base_id as i32 + 1,
-                last_collider_id: self.id,
+                last_collider_id: base_id as i32,
                 current_collider_id: -1,
             }
         ))
@@ -88,17 +90,6 @@ impl Astroid {
     pub fn check_collision(&self, point: Vec2, target_radius: f32) -> bool {
         let distance = (self.pos - point).length();
         return distance < (self.size + target_radius);
-    }
-
-    pub fn deflect(&mut self, force: bool, collider_id: i32) {
-        if(collider_id == self.last_collider_id && !force) {
-            return;
-        }
-        self.direction = self.direction * vec2(gen_range(to_rad(-10.), 
-            to_rad(10.)),
-            gen_range(to_rad(-10.), 
-            to_rad(10.)));
-        self.last_collider_id = collider_id;
     }
 
 }
