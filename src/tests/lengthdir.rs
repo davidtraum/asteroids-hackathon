@@ -1,3 +1,5 @@
+use crate::utils::angles::to_rad;
+
 #[test]
 fn rudimentary() {
     assert_eq!(to_rad(0.), 0.);

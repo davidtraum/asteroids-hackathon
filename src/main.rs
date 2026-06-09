@@ -29,11 +29,13 @@ async fn main() {
     let mut astroids = vec![];
     let mut spaceship = Spaceship::new(center);
     let mut context = Context { delta_time: 0.0 };
+    let mut astroid_id_counter: u32 = 0; 
 
     // let mut camera_post = spaceship.pos;
 
     for _ in 0..50 {
-        astroids.push(Astroid::new_at_random_position(center))
+        astroids.push(Astroid::new_at_random_position(center, astroid_id_counter));
+        astroid_id_counter += 1;
     }
 
     loop {
@@ -44,6 +46,28 @@ async fn main() {
 
         for astroid in &mut astroids {
             astroid.update(&context);
+        }
+
+        let mut astroid_indices_to_split = vec![];
+        for astroid_index in 0..astroids.len() {
+            for other_astroid_index in 0..astroids.len() {
+                if astroid_index != other_astroid_index
+                    && astroids[astroid_index].check_collision(astroids[other_astroid_index].pos, astroids[other_astroid_index].size)
+                {
+                    astroids[astroid_index].current_collider_id = astroids[other_astroid_index].id;
+                    astroid_indices_to_split.push(astroid_index);
+                    break;
+                }
+            }
+        }
+
+        for astroid_index in astroid_indices_to_split {
+            if let Some((astroid1, astroid2)) = astroids[astroid_index].split(astroid_id_counter, false, astroids[astroid_index].current_collider_id) {
+                astroids.push(astroid1);
+                astroids.push(astroid2);
+                astroids.remove(astroid_index);
+                astroid_id_counter += 2;
+            }  
         }
 
         // camera
